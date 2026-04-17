@@ -273,8 +273,8 @@ async function generate(){
   document.getElementById('ow').classList.remove('on');
   setP(5,'Starting...');
   try{
-    if(!K)await demoGen(p);
-    else await realGen(p);
+    await realGen(p);
+  
   }catch(e){
     console.error('Generate error:',e);
     showErr('Generation Failed',e.message||'Unknown error. Check your API key.');
