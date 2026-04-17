@@ -19,7 +19,7 @@ app.post('/api/generate', async (req, res) => {
   if (!prompt) return res.status(400).json({ error: 'Prompt required' });
   if (!WAVESPEED_KEY) return res.status(500).json({ error: 'No API key configured' });
   try {
-    const endpoint = `https://api.wavespeed.ai/api/v3/${model || 'wavespeed-ai/kling-v3-0-std/text-to-video'}`;
+    const endpoint = `https://api.wavespeed.ai/api/v3/${model ||'kwaivgi/kling-v3.0-std/text-to-video'
     const r = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${WAVESPEED_KEY}` },
