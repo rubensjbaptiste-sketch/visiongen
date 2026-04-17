@@ -159,8 +159,7 @@ select{width:100%;background:var(--s1);border:1px solid var(--b);color:var(--t);
       <div class="errbox" id="errbox"><strong id="errTitle">Error</strong><p id="errMsg"></p></div>
       <div class="sl">Model</div>
       <div class="mscr">
-        <div class="mc on" data-model="wavespeed-ai/wan-2.1-t2v-480p" onclick="selM(this)"><div class="mn">Kling 3.0 Std</div><div class="ms2">Fast & reliable</div><span class="mb2 bk">FAST</span></div>
-        <div class="mc" data-model="wavespeed-ai/wan-2-1-t2v-480p" onclick="selM(this)"><div class="mn">WAN 2.1</div><div class="ms2">Open source</div><span class="mb2 bf">FREE</span></div>
+        <div class="mc on" data-model="wavespeed-ai/wan-2.1-t2v-480p" onclick="selM(this)"><div class="mn">WAN 2.1</div><div class="ms2">Fast & reliable</div><span class="mb2 bf">FREE</span></div>
         <div class="mc" data-model="wavespeed-ai/kling-v3-0-pro/text-to-video" onclick="selM(this)"><div class="mn">Kling 3.0 Pro</div><div class="ms2">Best quality</div><span class="mb2 bp">PRO</span></div>
         <div class="mc" data-model="wavespeed-ai/hailuo-t2v-01-director" onclick="selM(this)"><div class="mn">HaiLuo</div><div class="ms2">Camera control</div><span class="mb2 bn">NEW</span></div>
         <div class="mc" data-model="wavespeed-ai/seedance-1-5-lite-t2v-480p" onclick="selM(this)"><div class="mn">Seedance 1.5</div><div class="ms2">Hollywood motion</div><span class="mb2 bp">PRO</span></div>
@@ -232,12 +231,14 @@ var QPS=[
 ];
 
 var MD=[
-  {id:'wavespeed-ai/wan-2.1-t2v-480p',name:'Kling 3.0 Std',badge:'FAST',bc:'bk',desc:'Cost-efficient Kling 3.0. Smooth motion, strong prompt adherence. Best for fast results and high-volume content.'},
-  {id:'wavespeed-ai/wan-2-1-t2v-480p',name:'WAN 2.1',badge:'FREE',bc:'bf',desc:'Open source powerhouse. Great physics and fluid motion. Most affordable — uses fewer credits per generation.'},
+  {id:'wavespeed-ai/wan-2.1-t2v-480p',name:'WAN 2.1',badge:'FREE',bc:'bf',desc:'Open source powerhouse. Great physics and fluid motion. Most affordable — uses fewer credits per generation.'},
   {id:'wavespeed-ai/kling-v3-0-pro/text-to-video',name:'Kling 3.0 Pro',badge:'PRO',bc:'bp',desc:'ByteDance flagship. Best quality, native audio, multi-shot AI director. Top choice for cinematic work.'},
   {id:'wavespeed-ai/hailuo-t2v-01-director',name:'HaiLuo Director',badge:'NEW',bc:'bn',desc:'MiniMax model with camera direction controls. Fast generation. Great for social media content.'},
   {id:'wavespeed-ai/seedance-1-5-lite-t2v-480p',name:'Seedance 1.5',badge:'PRO',bc:'bp',desc:'Hollywood-grade motion quality. Best for dramatic scenes and character animation.'}
 ];
+
+// WaveSpeed API base URL
+var WS_BASE = 'https://api.wavespeed.ai/api/v3';
 
 window.addEventListener('load',function(){updK();renderH();buildML();if(!localStorage.getItem('vg_seen')&&!K)setTimeout(openModal,700);localStorage.setItem('vg_seen','1');});
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;});
@@ -273,8 +274,11 @@ async function generate(){
   document.getElementById('ow').classList.remove('on');
   setP(5,'Starting...');
   try{
-    if(!K)await demoGen(p);
-    await realGen(p);
+    if(!K){
+      await demoGen(p);
+    } else {
+      await realGen(p);
+    }
   }catch(e){
     console.error('Generate error:',e);
     showErr('Generation Failed',e.message||'Unknown error. Check your API key.');
@@ -321,7 +325,6 @@ function playCanvas(prompt,scene){
   for(var i=0;i<22;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.4,dx:(Math.random()-.5)*.6,dy:(Math.random()-.5)*.6,h:Math.random()*360,a:Math.random()*6.28});
 
   function frame(){
-    // Draw scene
     if(scene==='city'){
       var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'hsl('+(210+Math.sin(t*.002)*8)+',55%,5%)');g.addColorStop(1,'hsl(220,45%,10%)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
       for(var i=0;i<13;i++){var bH=H*(.22+Math.sin(i*1.7)*.18),bX=i*(W/13);ctx.fillStyle='hsl(220,18%,'+(8+Math.sin(t*.008+i)*1.5)+'%)';ctx.fillRect(bX,H-bH,W/13-1,bH);for(var r=0;r<5;r++)for(var c=0;c<3;c++)if(Math.sin(i*13+r*7+c*3+t*.01)>.25){ctx.fillStyle='rgba(255,210,80,'+(0.3+Math.sin(t*.04+r+c)*.15)+')';ctx.fillRect(bX+2+c*(W/13/3),H-bH+5+r*(H*.06),W/13/3-2,H*.045);}}
@@ -347,60 +350,30 @@ function playCanvas(prompt,scene){
     }else if(scene==='snow'){
       var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'hsl(220,35%,7%)');g.addColorStop(1,'hsl(210,25%,13%)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
       ctx.fillStyle='rgba(220,230,255,.85)';ctx.beginPath();ctx.arc(W*.7,H*.12,8,0,6.28);ctx.fill();
-      for(var i=0;i<7;i++){var tx2=W*(.04+i*.14),ty2=H*.85,tw2=W*.055,th2=H*.3;ctx.fillStyle='hsl(140,'+(18+i*2)+'%,'+(8+i*2)+'%)';ctx.beginPath();ctx.moveTo(tx2,ty2-th2);ctx.lineTo(tx2-tw2,ty2);ctx.lineTo(tx2+tw2,ty2);ctx.closePath();ctx.fill();}
-      var sg2=ctx.createLinearGradient(0,H*.82,0,H);sg2.addColorStop(0,'rgba(220,230,255,.22)');sg2.addColorStop(1,'rgba(210,225,255,.42)');ctx.fillStyle=sg2;ctx.fillRect(0,H*.82,W,H*.18);
       if(!ctx._f)ctx._f=Array.from({length:55},function(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.4,spd:Math.random()*1.2+.3,dr:Math.random()*2-1};});
       ctx._f.forEach(function(f){f.y+=f.spd;f.x+=Math.sin(t*.04+f.dr)*.7;if(f.y>H){f.y=0;f.x=Math.random()*W;}ctx.fillStyle='rgba(220,235,255,'+(0.35+Math.random()*.3)+')';ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,6.28);ctx.fill();});
     }else if(scene==='tropical'){
       var g=ctx.createLinearGradient(0,0,0,H*.5);g.addColorStop(0,'hsl(195,75%,22%)');g.addColorStop(1,'hsl(200,65%,36%)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H*.5);
       ctx.fillStyle='rgba(255,230,90,.95)';ctx.beginPath();ctx.arc(W*.5,H*.18,13,0,6.28);ctx.fill();
       var wg=ctx.createLinearGradient(0,H*.48,0,H);wg.addColorStop(0,'hsl(185,75%,40%)');wg.addColorStop(1,'hsl(200,65%,16%)');ctx.fillStyle=wg;ctx.fillRect(0,H*.48,W,H*.52);
-      for(var i=0;i<4;i++){ctx.beginPath();ctx.moveTo(0,H*(.48+i*.06));for(var x=0;x<=W;x+=4)ctx.lineTo(x,H*(.48+i*.06)+Math.sin(x*.016+t*.018+i)*5);ctx.strokeStyle='rgba(180,240,255,'+(0.12+i*.05)+')';ctx.lineWidth=1.5;ctx.stroke();}
-      var sg3=ctx.createLinearGradient(0,H*.78,0,H);sg3.addColorStop(0,'rgba(245,230,178,.9)');sg3.addColorStop(1,'rgba(235,218,168,1)');ctx.fillStyle=sg3;ctx.fillRect(0,H*.78,W,H*.22);
-      ctx.strokeStyle='hsl(30,40%,20%)';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(W*.12,H*.82);ctx.quadraticCurveTo(W*.18,H*.52,W*.22,H*.3);ctx.stroke();
     }else if(scene==='fire'){
       ctx.fillStyle='#080204';ctx.fillRect(0,0,W,H);
-      var fg=ctx.createRadialGradient(W/2,H,0,W/2,H,H);fg.addColorStop(0,'rgba(255,100,20,.38)');fg.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=fg;ctx.fillRect(0,0,W,H);
       for(var i=0;i<11;i++){var fx=W*(.05+i*.09)+Math.sin(t*.06+i)*9,fh=H*(.3+Math.sin(t*.08+i*1.3)*.2);var fc=ctx.createLinearGradient(fx,H,fx,H-fh);fc.addColorStop(0,'rgba(255,200,0,.9)');fc.addColorStop(.4,'rgba(255,80,10,.75)');fc.addColorStop(1,'rgba(100,0,0,0)');ctx.fillStyle=fc;ctx.beginPath();ctx.moveTo(fx-7,H);for(var j=0;j<=8;j++){var jf=j/8;ctx.lineTo(fx-7+14*jf,H-fh*jf+Math.sin(jf*9.4+t*.1+i)*(1-jf)*11);}ctx.lineTo(fx+7,H);ctx.closePath();ctx.fill();}
-      if(!ctx._e)ctx._e=Array.from({length:35},function(){return{x:Math.random()*W,y:H,vx:(Math.random()-.5)*1.2,vy:-(Math.random()*2+.8),life:Math.random()};});
-      ctx._e.forEach(function(e){e.x+=e.vx;e.y+=e.vy;e.life-=.007;if(e.life<=0){e.x=Math.random()*W;e.y=H;e.life=1;}ctx.fillStyle='rgba(255,'+(140+Math.floor(Math.random()*100))+',0,'+e.life*.7+')';ctx.beginPath();ctx.arc(e.x,e.y,1.4*e.life,0,6.28);ctx.fill();});
-    }else if(scene==='garden'){
-      var g=ctx.createLinearGradient(0,0,0,H*.5);g.addColorStop(0,'hsl(195,58%,52%)');g.addColorStop(1,'hsl(200,48%,62%)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H*.5);
-      var gg2=ctx.createLinearGradient(0,H*.48,0,H);gg2.addColorStop(0,'hsl(120,48%,26%)');gg2.addColorStop(1,'hsl(125,42%,16%)');ctx.fillStyle=gg2;ctx.fillRect(0,H*.48,W,H*.52);
-      var fc2=['#f76ebc','#f7c96e','#ff6e6e','#6ef7c4','#c96ef7'];
-      for(var i=0;i<16;i++){var fx2=W*(.04+i*.06),fy2=H*(.74+Math.sin(i*1.7)*.06),fsw=Math.sin(t*.04+i)*.05;ctx.strokeStyle='hsl(120,38%,28%)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(fx2,fy2+H*.05);ctx.quadraticCurveTo(fx2+Math.sin(fsw)*7,fy2+H*.025,fx2,fy2);ctx.stroke();var fclr=fc2[i%fc2.length];for(var pp=0;pp<5;pp++){var pa=pp/5*6.28;ctx.fillStyle=fclr;ctx.beginPath();ctx.ellipse(fx2+Math.cos(pa)*4,fy2+Math.sin(pa)*4,4,2.5,pa,0,6.28);ctx.fill();}ctx.fillStyle='rgba(255,230,50,.9)';ctx.beginPath();ctx.arc(fx2,fy2,2.5,0,6.28);ctx.fill();}
     }else if(scene==='product'){
       ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);
-      var spl=ctx.createRadialGradient(W/2,0,0,W/2,0,H*.85);spl.addColorStop(0,'rgba(255,255,255,.1)');spl.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=spl;ctx.fillRect(0,0,W,H);
-      var surf=ctx.createLinearGradient(0,H*.58,0,H);surf.addColorStop(0,'rgba(40,35,60,.8)');surf.addColorStop(1,'rgba(12,10,22,1)');ctx.fillStyle=surf;ctx.fillRect(0,H*.58,W,H*.42);
       var bx=W/2+Math.sin(t*.012)*4,by=H*.5,bw=W*.055,bh=H*.34;var bg2=ctx.createLinearGradient(bx-bw,by-bh,bx+bw,by);bg2.addColorStop(0,'rgba(80,70,120,.9)');bg2.addColorStop(.4,'rgba(160,140,220,.9)');bg2.addColorStop(1,'rgba(100,80,160,.8)');ctx.fillStyle=bg2;ctx.fillRect(bx-bw,by-bh,bw*2,bh);
-      ctx.fillStyle='rgba(255,255,255,.22)';ctx.fillRect(bx-bw+3,by-bh+7,bw*.35,bh*.55);ctx.fillStyle='rgba(220,200,255,.92)';ctx.fillRect(bx-bw*.65,by-bh-H*.038,bw*1.3,H*.042);
     }else{
-      // Abstract
       ctx.fillStyle='rgba(4,4,8,.2)';ctx.fillRect(0,0,W,H);
       for(var i=0;i<5;i++){var cx2=W/2+Math.sin(t*.007+i*1.05)*W*.36,cy2=H/2+Math.cos(t*.005+i*.9)*H*.28,cr=W*(.17+Math.sin(t*.005+i)*.09),hue=(t*.25+i*72)%360;var cg=ctx.createRadialGradient(cx2,cy2,0,cx2,cy2,cr);cg.addColorStop(0,'hsla('+hue+',85%,65%,.16)');cg.addColorStop(1,'hsla('+hue+',85%,65%,0)');ctx.fillStyle=cg;ctx.fillRect(0,0,W,H);}
     }
-
-    // Particles
     pts.forEach(function(p2){p2.x+=p2.dx;p2.y+=p2.dy;p2.a+=.014;p2.h+=.22;if(p2.x<0||p2.x>W)p2.dx*=-1;if(p2.y<0||p2.y>H)p2.dy*=-1;ctx.fillStyle='hsla('+p2.h+',78%,68%,'+(0.1+Math.sin(p2.a)*.07)+')';ctx.beginPath();ctx.arc(p2.x,p2.y,p2.r,0,6.28);ctx.fill();});
-
-    // Film grain
     for(var i=0;i<40;i++){ctx.fillStyle='rgba(255,255,255,'+(Math.random()*.016)+')';ctx.fillRect(Math.random()*W,Math.random()*H,1,1);}
-    // Bars
     ctx.fillStyle='rgba(0,0,0,.9)';ctx.fillRect(0,0,W,H*.05);ctx.fillRect(0,H*.95,W,H*.05);
-    // Watermark
     ctx.save();ctx.globalAlpha=.75;ctx.fillStyle='rgba(0,0,0,.48)';ctx.fillRect(5,H*.05+3,88,17);
     ctx.fillStyle='#8070ff';ctx.font='bold 8.5px Syne,sans-serif';ctx.textAlign='left';ctx.fillText('Vision',9,H*.05+14);
     ctx.fillStyle='rgba(255,255,255,.48)';ctx.font='8px monospace';ctx.fillText('Gen',44,H*.05+14);
     ctx.fillStyle='rgba(255,200,70,.88)';ctx.font='bold 6.5px monospace';ctx.fillText('TRIAL',60,H*.05+14);
     ctx.restore();
-    // REC
-    ctx.save();ctx.globalAlpha=.7;
-    if(Math.floor(t/30)%2===0){ctx.fillStyle='rgba(255,60,60,.9)';ctx.beginPath();ctx.arc(9,H*.95-7,3,0,6.28);ctx.fill();}
-    ctx.fillStyle='rgba(255,255,255,.16)';ctx.font='7px monospace';ctx.textAlign='left';ctx.fillText(' REC  '+scene.toUpperCase(),14,H*.95-3);
-    var sec=Math.floor(t/60),fr=t%60;ctx.textAlign='right';ctx.fillText('00:00:'+('0'+sec).slice(-2)+':'+('0'+fr).slice(-2),W-5,H*.95-3);
-    ctx.restore();
-    // Prompt text
     if(scT>20&&scT<120){
       var fi=Math.min((scT-20)/18,1),fo=scT>100?Math.max(1-(scT-100)/18,0):1,ta=fi*fo*.86;
       ctx.save();ctx.globalAlpha=ta;
@@ -416,7 +389,6 @@ function playCanvas(prompt,scene){
     AID=requestAnimationFrame(frame);
   }
   frame();
-
   document.getElementById('ow').classList.add('on');
   var m=MD.find(function(x){return x.id===SM;});
   document.getElementById('chips').innerHTML='<div class="chip"><strong>'+(m?m.name:'AI Model')+'</strong></div><div class="chip" style="color:var(--a4);border-color:rgba(247,201,110,.3)">Trial &mdash; '+scene+'</div><div class="chip" style="color:var(--a3);border-color:rgba(110,247,196,.3)">Connect key for real video</div>';
@@ -424,44 +396,102 @@ function playCanvas(prompt,scene){
   toast('Demo: '+scene.toUpperCase()+' scene playing','ok');
 }
 
+// ─── REAL GENERATION: calls WaveSpeed API directly from browser ───
 async function realGen(p){
-  var dur=parseInt(document.getElementById('dur').value)||5;
-  var rat=document.getElementById('rat').value||'16:9';
-  setP(15,'Sending to server...');
-  var res;
-  try{
-    res=await fetch('/api/generate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:p,model:SM,duration:dur,ratio:rat})
+  var dur = parseInt(document.getElementById('dur').value) || 5;
+  var rat = document.getElementById('rat').value || '16:9';
+
+  setP(15, 'Submitting to WaveSpeed...');
+
+  // Step 1: Submit generation request
+  var submitRes;
+  try {
+    submitRes = await fetch(WS_BASE + '/' + SM + '/run', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + K
+      },
+      body: JSON.stringify({
+        prompt: p,
+        duration: dur,
+        aspect_ratio: rat,
+        size: '1280*720'
+      })
     });
-  }catch(fe){throw new Error('Network error: '+fe.message);}
-  var d={};try{d=await res.json();}catch(e2){}
-  if(!res.ok)throw new Error(d.error||'Server error '+res.status);
-  var rid=d.requestId;
-  if(!rid)throw new Error('No request ID from server');
-  setP(30,'Rendering on GPU...');
-  var url=null;
-  for(var i=0;i<80&&!url;i++){
-    await sl(3000);
-    setP(Math.min(32+i,92),['Processing...','Rendering...','Almost done...'][i%3]);
-    try{
-      var pr=await fetch('/api/status/'+rid);
-      var pd={};try{pd=await pr.json();}catch(e3){}
-      if(pd.status==='completed'&&pd.url)url=pd.url;
-      else if(pd.status==='failed')throw new Error('Generation failed on server');
-    }catch(pe){if(pe.message.indexOf('failed')>=0)throw pe;}
+  } catch(fe) {
+    throw new Error('Network error — check connection: ' + fe.message);
   }
-  if(!url)throw new Error('Timed out. Try again.');
-  setP(100,'Done!');await sl(150);
-  if(AID){cancelAnimationFrame(AID);AID=null;}
-  CU=url;
-  document.getElementById('vf').innerHTML='<video src="'+url+'" controls autoplay loop playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>';
+
+  var submitData = {};
+  try { submitData = await submitRes.json(); } catch(e) {}
+
+  if (!submitRes.ok) {
+    var errMsg = submitData.message || submitData.error || ('API error ' + submitRes.status);
+    throw new Error(errMsg);
+  }
+
+  // Extract request ID — WaveSpeed returns it in data.id or id
+  var rid = (submitData.data && submitData.data.id) || submitData.id || submitData.request_id;
+  if (!rid) throw new Error('No request ID returned. Check model availability.');
+
+  setP(30, 'Queued — waiting for GPU...');
+
+  // Step 2: Poll for completion
+  var videoUrl = null;
+  var maxAttempts = 120; // 6 minutes max (3s intervals)
+  for (var i = 0; i < maxAttempts && !videoUrl; i++) {
+    await sl(3000);
+    var pct = Math.min(32 + Math.floor(i * 0.5), 92);
+    var labels = ['Processing...', 'Rendering frames...', 'Compositing...', 'Almost done...'];
+    setP(pct, labels[i % labels.length]);
+
+    try {
+      var pollRes = await fetch(WS_BASE + '/tasks/' + rid + '/fetch', {
+        headers: { 'Authorization': 'Bearer ' + K }
+      });
+      var pollData = {};
+      try { pollData = await pollRes.json(); } catch(e) {}
+
+      var taskData = pollData.data || pollData;
+      var status = taskData.status || taskData.state || '';
+
+      if (status === 'completed' || status === 'succeeded' || status === 'success') {
+        // Try multiple possible locations for the video URL
+        videoUrl = (taskData.outputs && taskData.outputs[0]) ||
+                   (taskData.output && taskData.output[0]) ||
+                   taskData.video_url || taskData.url ||
+                   (taskData.results && taskData.results[0] && taskData.results[0].url);
+      } else if (status === 'failed' || status === 'error') {
+        throw new Error('Generation failed: ' + (taskData.error || taskData.message || 'unknown reason'));
+      }
+      // statuses like 'pending', 'running', 'processing' → keep polling
+    } catch(pe) {
+      if (pe.message.indexOf('failed') >= 0 || pe.message.indexOf('error') >= 0) throw pe;
+    }
+  }
+
+  if (!videoUrl) throw new Error('Timed out waiting for video. Try again.');
+
+  setP(100, 'Done!');
+  await sl(150);
+
+  if (AID) { cancelAnimationFrame(AID); AID = null; }
+  CU = videoUrl;
+
+  document.getElementById('vf').innerHTML =
+    '<video src="' + videoUrl + '" controls autoplay loop playsinline webkit-playsinline ' +
+    'style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>';
   document.getElementById('ow').classList.add('on');
-  var m=MD.find(function(x){return x.id===SM;});
-  document.getElementById('chips').innerHTML='<div class="chip"><strong>'+(m?m.name:SM)+'</strong></div><div class="chip" style="color:var(--a3);border-color:rgba(110,247,196,.3)">Real AI video</div>';
-  addH(p,SM,url);toast('Video generated!','ok');
-  document.getElementById('ow').scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  var m = MD.find(function(x){ return x.id === SM; });
+  document.getElementById('chips').innerHTML =
+    '<div class="chip"><strong>' + (m ? m.name : SM) + '</strong></div>' +
+    '<div class="chip" style="color:var(--a3);border-color:rgba(110,247,196,.3)">Real AI video ✓</div>';
+
+  addH(p, SM, videoUrl);
+  toast('Video generated!', 'ok');
+  document.getElementById('ow').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function addH(p,m,u){HIST.unshift({p:p,m:m,u:u});if(HIST.length>20)HIST=HIST.slice(0,20);localStorage.setItem('vg_h',JSON.stringify(HIST));renderH();}
