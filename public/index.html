@@ -159,7 +159,7 @@ select{width:100%;background:var(--s1);border:1px solid var(--b);color:var(--t);
       <div class="errbox" id="errbox"><strong id="errTitle">Error</strong><p id="errMsg"></p></div>
       <div class="sl">Model</div>
       <div class="mscr">
-        <div class="mc on" data-model="wavespeed-ai/kling-v3-0-std/text-to-video" onclick="selM(this)"><div class="mn">Kling 3.0 Std</div><div class="ms2">Fast & reliable</div><span class="mb2 bk">FAST</span></div>
+        <div class="mc on" data-model="wavespeed-ai/wan-2.1-t2v-480p" onclick="selM(this)"><div class="mn">Kling 3.0 Std</div><div class="ms2">Fast & reliable</div><span class="mb2 bk">FAST</span></div>
         <div class="mc" data-model="wavespeed-ai/wan-2-1-t2v-480p" onclick="selM(this)"><div class="mn">WAN 2.1</div><div class="ms2">Open source</div><span class="mb2 bf">FREE</span></div>
         <div class="mc" data-model="wavespeed-ai/kling-v3-0-pro/text-to-video" onclick="selM(this)"><div class="mn">Kling 3.0 Pro</div><div class="ms2">Best quality</div><span class="mb2 bp">PRO</span></div>
         <div class="mc" data-model="wavespeed-ai/hailuo-t2v-01-director" onclick="selM(this)"><div class="mn">HaiLuo</div><div class="ms2">Camera control</div><span class="mb2 bn">NEW</span></div>
@@ -217,7 +217,7 @@ select{width:100%;background:var(--s1);border:1px solid var(--b);color:var(--t);
 <div class="toast" id="toastEl"></div>
 <script>
 var K=localStorage.getItem('vg_k')||'';
-var SM='wavespeed-ai/kling-v3-0-std/text-to-video';
+var SM='wavespeed-ai/wan-2.1-t2v-480p';
 var CU=null,HIST=JSON.parse(localStorage.getItem('vg_h')||'[]'),busy=false,dp=null,AID=null;
 
 var QPS=[
@@ -232,7 +232,7 @@ var QPS=[
 ];
 
 var MD=[
-  {id:'wavespeed-ai/kling-v3-0-std/text-to-video',name:'Kling 3.0 Std',badge:'FAST',bc:'bk',desc:'Cost-efficient Kling 3.0. Smooth motion, strong prompt adherence. Best for fast results and high-volume content.'},
+  {id:'wavespeed-ai/wan-2.1-t2v-480p',name:'Kling 3.0 Std',badge:'FAST',bc:'bk',desc:'Cost-efficient Kling 3.0. Smooth motion, strong prompt adherence. Best for fast results and high-volume content.'},
   {id:'wavespeed-ai/wan-2-1-t2v-480p',name:'WAN 2.1',badge:'FREE',bc:'bf',desc:'Open source powerhouse. Great physics and fluid motion. Most affordable — uses fewer credits per generation.'},
   {id:'wavespeed-ai/kling-v3-0-pro/text-to-video',name:'Kling 3.0 Pro',badge:'PRO',bc:'bp',desc:'ByteDance flagship. Best quality, native audio, multi-shot AI director. Top choice for cinematic work.'},
   {id:'wavespeed-ai/hailuo-t2v-01-director',name:'HaiLuo Director',badge:'NEW',bc:'bn',desc:'MiniMax model with camera direction controls. Fast generation. Great for social media content.'},
