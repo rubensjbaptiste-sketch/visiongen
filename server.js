@@ -16,7 +16,7 @@ app.get('/api/health', function(req, res) {
 
 app.post('/api/generate', async function(req, res) {
   const prompt = req.body.prompt;
-  const model = req.body.model || 'kwaivgi/kling-v3.0-std/text-to-video';
+  const model = req.body.model ||'wavespeed-ai/wan-2.1-t2v-480p'
   const duration = req.body.duration || 5;
   const ratio = req.body.ratio || '16:9';
 
