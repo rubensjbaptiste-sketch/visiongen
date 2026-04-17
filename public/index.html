@@ -273,8 +273,8 @@ async function generate(){
   document.getElementById('ow').classList.remove('on');
   setP(5,'Starting...');
   try{
+    if(!K)await demoGen(p);
     await realGen(p);
-  
   }catch(e){
     console.error('Generate error:',e);
     showErr('Generation Failed',e.message||'Unknown error. Check your API key.');
@@ -427,54 +427,39 @@ function playCanvas(prompt,scene){
 async function realGen(p){
   var dur=parseInt(document.getElementById('dur').value)||5;
   var rat=document.getElementById('rat').value||'16:9';
-  var endpoint='https://api.wavespeed.ai/api/v3/'+SM;
-  console.log('POST',endpoint,'dur:',dur,'ratio:',rat,'prompt:',p.slice(0,50));
-  setP(15,'Connecting to WaveSpeed...');
-
+  setP(15,'Sending to server...');
   var res;
-  try{res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+K},body:JSON.stringify({prompt:p,duration:dur,ratio:rat,enable_safety_checker:true})});}
-  catch(fe){throw new Error('Network error: '+fe.message+'. Check your internet.');}
-
-  var d={};
-  try{d=await res.json();}catch(je){d={};}
-  console.log('Response:',res.status,JSON.stringify(d).slice(0,200));
-
-  if(!res.ok){
-    var msg=(d.message||d.error||d.detail)||'Server error '+res.status;
-    if(res.status===401)msg='Invalid API key. Go to Settings and re-enter your WaveSpeed key.';
-    else if(res.status===402)msg='Out of credits. Top up your WaveSpeed account at wavespeed.ai.';
-    else if(res.status===422)msg='Invalid request (422). Try a shorter prompt or different duration.';
-    else if(res.status===429)msg='Rate limit hit. Wait a moment then try again.';
-    throw new Error(msg);
-  }
-
-  var rid=(d.data&&d.data.id)||d.id;
-  if(!rid)throw new Error('No job ID returned. Response: '+JSON.stringify(d).slice(0,80));
-  setP(30,'Job queued on GPU...');
-
+  try{
+    res=await fetch('/api/generate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:p,model:SM,duration:dur,ratio:rat})
+    });
+  }catch(fe){throw new Error('Network error: '+fe.message);}
+  var d={};try{d=await res.json();}catch(e2){}
+  if(!res.ok)throw new Error(d.error||'Server error '+res.status);
+  var rid=d.requestId;
+  if(!rid)throw new Error('No request ID from server');
+  setP(30,'Rendering on GPU...');
   var url=null;
-  var lbls=['Processing frames...','Rendering motion...','Applying physics...','Composing scene...','Almost there...'];
   for(var i=0;i<80&&!url;i++){
     await sl(3000);
-    setP(Math.min(32+i,92),lbls[i%5]);
+    setP(Math.min(32+i,92),['Processing...','Rendering...','Almost done...'][i%3]);
     try{
-      var pr=await fetch('https://api.wavespeed.ai/api/v3/predictions/'+rid+'/result',{headers:{'Authorization':'Bearer '+K}});
-      var pd={};try{pd=await pr.json();}catch(e2){}
-      var st=pd.data&&pd.data.status;
-      console.log('Poll',i,':',st);
-      if(st==='completed'&&pd.data.outputs&&pd.data.outputs[0])url=pd.data.outputs[0];
-      else if(st==='failed')throw new Error('WaveSpeed generation failed. Try a different prompt or model.');
-    }catch(pe){if(pe.message.indexOf('failed')>=0||pe.message.indexOf('Failed')>=0)throw pe;}
+      var pr=await fetch('/api/status/'+rid);
+      var pd={};try{pd=await pr.json();}catch(e3){}
+      if(pd.status==='completed'&&pd.url)url=pd.url;
+      else if(pd.status==='failed')throw new Error('Generation failed on server');
+    }catch(pe){if(pe.message.indexOf('failed')>=0)throw pe;}
   }
-
-  if(!url)throw new Error('Timed out after 4 min. Try again with shorter duration (4s or 5s).');
+  if(!url)throw new Error('Timed out. Try again.');
   setP(100,'Done!');await sl(150);
   if(AID){cancelAnimationFrame(AID);AID=null;}
   CU=url;
   document.getElementById('vf').innerHTML='<video src="'+url+'" controls autoplay loop playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>';
   document.getElementById('ow').classList.add('on');
   var m=MD.find(function(x){return x.id===SM;});
-  document.getElementById('chips').innerHTML='<div class="chip"><strong>'+(m?m.name:SM)+'</strong></div><div class="chip">'+dur+'s &middot; '+rat+'</div><div class="chip" style="color:var(--a3);border-color:rgba(110,247,196,.3)">Real AI video</div>';
+  document.getElementById('chips').innerHTML='<div class="chip"><strong>'+(m?m.name:SM)+'</strong></div><div class="chip" style="color:var(--a3);border-color:rgba(110,247,196,.3)">Real AI video</div>';
   addH(p,SM,url);toast('Video generated!','ok');
   document.getElementById('ow').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
