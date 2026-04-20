@@ -22,11 +22,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ─── MODEL MAP ───────────────────────────────────────
 // Maps your app's model IDs to WaveSpeed's actual API model strings
 const MODEL_MAP = {
-  'kling-std':  'wavespeed-ai/kling-video-v1.6-pro',
-  'kling-pro':  'wavespeed-ai/kling-video-v1.6-pro',
+  'kling-std':  'kwaivgi/kling-v3.0-std/text-to-video',
+  'kling-pro':  'kwaivgi/kling-v3.0-pro/text-to-video',
   'wan21':      'wavespeed-ai/wan2.1-t2v-720p',
   'hailuo':     'wavespeed-ai/hailuo-video-01',
-  'seedance':   'wavespeed-ai/kling-video-v1.6-pro'
+  'seedance':   'kwaivgi/kling-v3.0-std/text-to-video'
 };
 
 // ─── ROUTE: GENERATE VIDEO ───────────────────────────
@@ -60,7 +60,7 @@ app.post('/api/generate', async (req, res) => {
     console.log(`[VisionGen] Generating video — model: ${modelId}, prompt: "${prompt.substring(0, 60)}..."`);
 
     // Send to WaveSpeed API
-    const response = await fetch(`https://api.wavespeed.ai/api/v2/${modelId}`, {
+   const response = await fetch(`https://api.wavespeed.ai/api/v3/${modelId}`, {
       method:  'POST',
       headers: {
         'Content-Type':  'application/json',
@@ -105,7 +105,7 @@ app.get('/api/status/:id', async (req, res) => {
     }
 
     // Check status with WaveSpeed
-    const response = await fetch(`https://api.wavespeed.ai/api/v2/predictions/${id}`, {
+    const response = await fetch(`https://api.wavespeed.ai/api/v3/predictions/${id}/result`, {
       headers: {
         'Authorization': `Bearer ${apiKey}`
       }
