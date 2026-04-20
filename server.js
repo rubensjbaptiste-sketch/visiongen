@@ -60,7 +60,7 @@ app.post('/api/generate', async (req, res) => {
     console.log(`[VisionGen] Generating video — model: ${modelId}, prompt: "${prompt.substring(0, 60)}..."`);
 
     // Send to WaveSpeed API
-  const response = await fetch(`https://api.wavespeed.ai/api/v2/${modelId}`
+ const response = await fetch(`https://api.wavespeed.ai/api/v3/${modelId}`, {
       method:  'POST',
       headers: {
         'Content-Type':  'application/json',
