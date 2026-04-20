@@ -22,11 +22,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ─── MODEL MAP ───────────────────────────────────────
 // Maps your app's model IDs to WaveSpeed's actual API model strings
 const MODEL_MAP = {
-  'kling-std':  'wavespeed-ai/kling-video-v2-master',
-  'kling-pro':  'wavespeed-ai/kling-video-v2-master-pro',
-  'wan21':      'wavespeed-ai/wan-2.1-t2v-480p',
-  'hailuo':     'wavespeed-ai/hailuo-ai-video-01-director',
-  'seedance':   'wavespeed-ai/seedance-1-lite-t2v'
+  'kling-std':  'wavespeed-ai/kling-video-v1.6-pro',
+  'kling-pro':  'wavespeed-ai/kling-video-v1.6-pro',
+  'wan21':      'wavespeed-ai/wan2.1-t2v-720p',
+  'hailuo':     'wavespeed-ai/hailuo-video-01',
+  'seedance':   'wavespeed-ai/kling-video-v1.6-pro'
 };
 
 // ─── ROUTE: GENERATE VIDEO ───────────────────────────
