@@ -24,9 +24,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 const MODEL_MAP = {
   'kling-std':  'kwaivgi/kling-v3.0-std/text-to-video',
   'kling-pro':  'kwaivgi/kling-v3.0-pro/text-to-video',
-  'wan21':      'wavespeed-ai/wan2.1-t2v-720p',
-  'hailuo':     'wavespeed-ai/hailuo-video-01',
-  'seedance':   'kwaivgi/kling-v3.0-std/text-to-video'
+  'wan21':      'kwaivgi/kling-v3.0-std/text-to-video',
+  'hailuo':     'kwaivgi/kling-v3.0-std/text-to-video',
+  'seedance':   'kwaivgi/kling-v3.0-pro/text-to-video'
 };
 
 // ─── ROUTE: GENERATE VIDEO ───────────────────────────
@@ -60,7 +60,7 @@ app.post('/api/generate', async (req, res) => {
     console.log(`[VisionGen] Generating video — model: ${modelId}, prompt: "${prompt.substring(0, 60)}..."`);
 
     // Send to WaveSpeed API
-   const response = await fetch(`https://api.wavespeed.ai/api/v3/${modelId}`, {
+  const response = await fetch(`https://api.wavespeed.ai/api/v2/${modelId}`
       method:  'POST',
       headers: {
         'Content-Type':  'application/json',
